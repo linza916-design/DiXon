@@ -37,345 +37,465 @@ export default function FamilyDashboard({
   const triggerDownload = () => {
     setIsDownloading(true);
     setDownloadSuccess(false);
+
     setTimeout(() => {
       setIsDownloading(false);
       setDownloadSuccess(true);
+
       setTimeout(() => setDownloadSuccess(false), 3000);
     }, 2000);
   };
 
   return (
-    <div className="space-y-8 font-sans">
-      {/* Overview Card: Family Health Index Overview */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Core Gauge Panel */}
-        <div className="lg:col-span-1 bg-white rounded-3xl p-6 md:p-8 border border-outline-variant/20 shadow-sm flex flex-col justify-between items-center text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-5">
-            <Dna className="w-24 h-24 text-primary" />
-          </div>
+    <div className="space-y-10 font-sans">
+      {/* TOP OVERVIEW */}
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        {/* SCORE CARD */}
+        <div className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-[#07110c] p-7 shadow-[0_25px_80px_rgba(0,0,0,0.45)]">
+          {/* Ambient */}
+          <div className="absolute top-[-20%] right-[-20%] w-[240px] h-[240px] rounded-full bg-emerald-400/10 blur-[80px]" />
+          <div className="absolute bottom-[-20%] left-[-20%] w-[220px] h-[220px] rounded-full bg-cyan-400/10 blur-[80px]" />
 
-          <div className="w-full flex justify-between items-center mb-6">
-            <span className="text-xs font-bold text-primary uppercase tracking-wider">
-              Family Health Score
-            </span>
-            <span className="px-2.5 py-0.5 bg-secondary-container text-on-secondary-container text-[10px] font-bold rounded-full">
-              OPTIMAL
-            </span>
-          </div>
+          <div className="relative z-10 flex flex-col items-center text-center">
+            <div className="w-full flex justify-between items-center mb-8">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.2em] text-white/35 font-mono">
+                  Family Health Score
+                </p>
 
-          {/* SVG Radial Gauge */}
-          <div className="relative w-44 h-44 flex items-center justify-center">
-            <svg className="w-full h-full transform -rotate-90">
-              <circle
-                cx="88"
-                cy="88"
-                r="74"
-                className="stroke-cream-dark"
-                strokeWidth="10"
-                fill="transparent"
-              />
-              <motion.circle
-                cx="88"
-                cy="88"
-                r="74"
-                className="stroke-primary"
-                strokeWidth="10"
-                fill="transparent"
-                strokeDasharray={2 * Math.PI * 74}
-                initial={{ strokeDashoffset: 2 * Math.PI * 74 }}
-                animate={{ strokeDashoffset: 2 * Math.PI * 74 * (1 - 0.855) }} // Mean of scores
-                transition={{ duration: 1.5, ease: "easeOut" }}
-                strokeLinecap="round"
-              />
-            </svg>
-            <div className="absolute flex flex-col items-center justify-center text-center">
-              <span className="font-serif text-5xl font-extrabold text-primary">
-                85.5
-              </span>
-              <span className="text-[10px] font-mono tracking-widest text-[#737973] uppercase mt-1">
-                Excellent Index
-              </span>
+                <h4 className="text-white text-lg font-semibold mt-1">
+                  Clinical Wellness Index
+                </h4>
+              </div>
+
+              <div className="px-3 py-1 rounded-full border border-emerald-400/20 bg-emerald-400/10 text-emerald-300 text-[10px] font-bold uppercase tracking-[0.18em]">
+                Optimal
+              </div>
             </div>
-          </div>
 
-          <div className="mt-6 text-center space-y-1">
-            <p className="text-xs text-outline leading-snug">
-              Metabolic variance stands at <b>-3%</b> below normal baseline.
-              Premium mineral reserves are adequate.
+            {/* Gauge */}
+            <div className="relative w-52 h-52 flex items-center justify-center">
+              <svg className="w-full h-full -rotate-90">
+                <circle
+                  cx="104"
+                  cy="104"
+                  r="84"
+                  stroke="rgba(255,255,255,0.08)"
+                  strokeWidth="12"
+                  fill="transparent"
+                />
+
+                <motion.circle
+                  cx="104"
+                  cy="104"
+                  r="84"
+                  stroke="url(#gradient)"
+                  strokeWidth="12"
+                  fill="transparent"
+                  strokeDasharray={2 * Math.PI * 84}
+                  initial={{ strokeDashoffset: 2 * Math.PI * 84 }}
+                  animate={{
+                    strokeDashoffset: 2 * Math.PI * 84 * (1 - 0.855),
+                  }}
+                  transition={{ duration: 1.6, ease: "easeOut" }}
+                  strokeLinecap="round"
+                />
+
+                <defs>
+                  <linearGradient
+                    id="gradient"
+                    x1="0%"
+                    y1="0%"
+                    x2="100%"
+                    y2="100%"
+                  >
+                    <stop offset="0%" stopColor="#34d399" />
+                    <stop offset="100%" stopColor="#22d3ee" />
+                  </linearGradient>
+                </defs>
+              </svg>
+
+              <div className="absolute flex flex-col items-center">
+                <span className="text-6xl font-black text-white tracking-tight">
+                  85.5
+                </span>
+
+                <span className="mt-2 text-[10px] uppercase tracking-[0.22em] text-white/35 font-mono">
+                  Excellent Index
+                </span>
+              </div>
+            </div>
+
+            <p className="mt-8 text-sm text-white/55 leading-relaxed max-w-xs">
+              Metabolic variance stands at{" "}
+              <span className="text-emerald-300 font-semibold">-3%</span> below
+              baseline. Nutritional reserves remain clinically stable.
             </p>
           </div>
         </div>
 
-        {/* Detailed Insights PDF Download Panel */}
-        <div className="lg:col-span-2 bg-gradient-to-br from-primary-container to-[#0b2413] text-white rounded-3xl p-6 md:p-8 flex flex-col justify-between relative overflow-hidden shadow-lg">
-          {/* Ambient Glow */}
-          <div className="absolute -bottom-20 -right-20 w-80 h-80 rounded-full bg-secondary/15 blur-[80px]" />
+        {/* REPORT PANEL */}
+        <div className="xl:col-span-2 relative overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-[#08140d] via-[#0b1d13] to-[#10291a] p-8 shadow-[0_25px_80px_rgba(0,0,0,0.4)]">
+          <div className="absolute top-[-15%] right-[-10%] w-[360px] h-[360px] rounded-full bg-emerald-400/10 blur-[120px]" />
 
-          <div className="relative space-y-4">
-            <div className="flex items-center gap-2">
-              <span className="px-3 py-1 bg-white/10 backdrop-blur-md rounded-full text-[10px] font-bold font-mono tracking-widest uppercase">
-                Verified Diagnostic
-              </span>
-              <span className="text-secondary-container flex items-center gap-1 text-[11px] font-bold font-sans">
-                <ShieldCheck className="w-3.5 h-3.5" /> Checked 12 hrs ago
-              </span>
+          <div className="relative z-10 h-full flex flex-col justify-between">
+            <div>
+              <div className="flex flex-wrap gap-3 items-center mb-6">
+                <div className="px-4 py-2 rounded-full bg-white/5 border border-white/10 text-[10px] uppercase tracking-[0.22em] text-white/45 font-mono">
+                  Verified Diagnostic
+                </div>
+
+                <div className="inline-flex items-center gap-2 text-[11px] text-emerald-300 font-semibold">
+                  <ShieldCheck className="w-4 h-4" />
+                  Updated 12 hrs ago
+                </div>
+              </div>
+
+              <h3 className="font-serif text-4xl md:text-5xl leading-[1.05] text-white font-semibold max-w-3xl">
+                Family Genomic & Wellness Intelligence Report
+              </h3>
+
+              <p className="mt-5 max-w-2xl text-white/55 leading-relaxed text-sm md:text-base">
+                Your complete 42-page metabolic handbook contains nutrient
+                analytics, pediatric growth markers, immunity optimization
+                protocols, and pet vitality diagnostics.
+              </p>
             </div>
 
-            <h3 className="font-serif text-3xl md:text-4xl font-semibold leading-tight text-[#fbf9f4]">
-              Family Genomic & Supplement Analysis Report
-            </h3>
+            <div className="mt-10 flex flex-col md:flex-row gap-4">
+              <button
+                onClick={triggerDownload}
+                disabled={isDownloading}
+                className="group h-14 px-7 rounded-2xl bg-gradient-to-r from-emerald-400 to-cyan-400 text-black font-semibold text-sm shadow-[0_15px_40px_rgba(52,211,153,0.2)] hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 cursor-pointer"
+              >
+                {isDownloading ? (
+                  <>
+                    <Clock className="w-4 h-4 animate-spin" />
+                    Generating Dossier...
+                  </>
+                ) : downloadSuccess ? (
+                  <>
+                    <CheckCircle className="w-4 h-4" />
+                    Download Complete
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4" />
+                    Download Full PDF Report
+                  </>
+                )}
+              </button>
 
-            <p className="text-sm text-cream/80 max-w-xl leading-relaxed">
-              Your customized 42-page metabolic handbook containing molecular
-              nutrient levels, pet joint vitality metrics (Leo), pediatric
-              growth indexes (Mia), and active immunity optimization guidelines
-              is fully updated.
-            </p>
-          </div>
-
-          <div className="relative pt-6 flex flex-col md:flex-row gap-3 items-center">
-            <button
-              onClick={triggerDownload}
-              disabled={isDownloading}
-              className="w-full md:w-auto px-6 h-12 bg-cream text-primary text-xs font-bold rounded-full hover:bg-white active:scale-95 transition-all flex items-center justify-center gap-2.5 cursor-pointer"
-            >
-              {isDownloading ? (
-                <>
-                  <Clock className="w-4 h-4 animate-spin text-primary" />
-                  Generating Dossier...
-                </>
-              ) : downloadSuccess ? (
-                <>
-                  <CheckCircle className="w-4 h-4 text-green-600 animate-pulse" />
-                  Purity Dossier Downloaded!
-                </>
-              ) : (
-                <>
-                  <Download className="w-4 h-4 text-primary" />
-                  Download 42-page Breakdown (PDF)
-                </>
-              )}
-            </button>
-
-            <button
-              onClick={() =>
-                onAskAdvisor(
-                  `How do I improve my family's metabolic index of 85.5?`,
-                )
-              }
-              className="w-full md:w-auto px-6 h-12 border border-white/20 hover:bg-white/15 text-xs font-bold rounded-full text-white cursor-pointer transition-all flex items-center justify-center gap-2"
-            >
-              Ask Gemini Advisor
-              <ArrowRight className="w-3.5 h-3.5" />
-            </button>
+              <button
+                onClick={() =>
+                  onAskAdvisor(
+                    `How do I improve my family's metabolic index of 85.5?`,
+                  )
+                }
+                className="h-14 px-7 rounded-2xl border border-white/10 bg-white/[0.04] hover:bg-white/[0.07] text-white text-sm font-semibold transition-all flex items-center justify-center gap-3 cursor-pointer"
+              >
+                Ask Gemini Advisor
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Profile Toggles & Snapshots */}
-      <div className="space-y-5">
-        <div className="flex justify-between items-center">
-          <h4 className="font-serif text-2xl font-bold text-primary">
-            Wellness Hub Members
-          </h4>
-          <span className="text-xs text-outline font-medium">
-            Select a profile to view specific metrics
-          </span>
+      {/* MEMBERS */}
+      <div className="space-y-6">
+        <div className="flex flex-col md:flex-row justify-between md:items-end gap-3">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.22em] text-[#3e5a4a] font-mono mb-2">
+              Wellness Profiles
+            </p>
+
+            <h3 className="font-serif text-4xl text-[#07110c] font-semibold tracking-tight">
+              Family Members
+            </h3>
+          </div>
+
+          <p className="text-sm text-[#6b7d73]">
+            Select a profile to review detailed metabolic insights.
+          </p>
         </div>
 
-        {/* Carousel / Member Selection Row */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {/* CARDS */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
           {members.map((m) => {
             const isSelected = m.id === selectedId;
+
             return (
-              <button
+              <motion.button
+                whileHover={{ y: -4 }}
+                whileTap={{ scale: 0.98 }}
                 key={m.id}
                 onClick={() => setSelectedId(m.id)}
-                className={`p-4 md:p-5 text-left rounded-3xl border transition-all cursor-pointer relative group flex flex-col justify-between min-h-[160px] ${
+                className={`group relative overflow-hidden rounded-[1.8rem] border p-5 text-left transition-all min-h-[220px] ${
                   isSelected
-                    ? "bg-white border-primary shadow-md ring-1 ring-primary/20"
-                    : "bg-white/50 hover:bg-white border-outline-variant/15 hover:shadow-sm"
+                    ? "bg-[#07110c] border-emerald-400/20 shadow-[0_20px_50px_rgba(0,0,0,0.18)]"
+                    : "bg-white border-[#eef2ef] hover:border-[#d8e6dc] shadow-sm"
                 }`}
               >
-                {/* Checkmark indicator for selected member */}
+                {/* Glow */}
                 {isSelected && (
-                  <span className="absolute top-4 right-4 p-1 bg-primary text-white rounded-full">
-                    <UserCheck className="w-3 h-3" />
-                  </span>
+                  <div className="absolute top-[-20%] right-[-20%] w-[180px] h-[180px] rounded-full bg-emerald-400/10 blur-[70px]" />
                 )}
 
-                {/* Avatar */}
-                <div className="relative">
-                  <img
-                    src={m.avatar}
-                    alt={m.name}
-                    referrerPolicy="no-referrer"
-                    className="w-12 h-12 rounded-full object-cover border-2 border-cream shadow-inner group-hover:scale-105 transition-transform"
-                  />
-                  <div className="absolute -bottom-1 -right-1 p-0.5 bg-white rounded-full shadow">
-                    <div className="w-2.5 h-2.5 bg-green-500 rounded-full border border-white" />
+                {/* Selected */}
+                {isSelected && (
+                  <div className="absolute top-5 right-5 w-8 h-8 rounded-full bg-emerald-400 flex items-center justify-center text-black shadow-lg">
+                    <UserCheck className="w-4 h-4" />
+                  </div>
+                )}
+
+                <div className="relative z-10 flex flex-col h-full justify-between">
+                  <div>
+                    <div className="relative w-fit">
+                      <img
+                        src={m.avatar}
+                        alt={m.name}
+                        referrerPolicy="no-referrer"
+                        className={`w-16 h-16 rounded-2xl object-cover border transition-all ${
+                          isSelected ? "border-white/20" : "border-[#f3f4f3]"
+                        }`}
+                      />
+
+                      <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-400 border-2 border-white" />
+                    </div>
+
+                    <div className="mt-5">
+                      <h4
+                        className={`font-serif text-2xl leading-none transition-colors ${
+                          isSelected ? "text-white" : "text-[#07110c]"
+                        }`}
+                      >
+                        {m.name}
+                      </h4>
+
+                      <p
+                        className={`mt-2 text-[10px] uppercase tracking-[0.22em] font-mono ${
+                          isSelected ? "text-white/40" : "text-[#708277]"
+                        }`}
+                      >
+                        {m.role}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-6">
+                    <div
+                      className={`flex items-center justify-between rounded-2xl px-4 py-3 border ${
+                        isSelected
+                          ? "bg-white/[0.04] border-white/10"
+                          : "bg-[#f7faf8] border-[#eef2ef]"
+                      }`}
+                    >
+                      <span
+                        className={`text-[10px] uppercase tracking-[0.2em] font-mono ${
+                          isSelected ? "text-white/35" : "text-[#708277]"
+                        }`}
+                      >
+                        Health Index
+                      </span>
+
+                      <span
+                        className={`font-bold text-sm ${
+                          isSelected ? "text-emerald-300" : "text-[#07110c]"
+                        }`}
+                      >
+                        {m.healthScore}%
+                      </span>
+                    </div>
                   </div>
                 </div>
-
-                {/* Profile Meta */}
-                <div className="mt-4 space-y-1">
-                  <h5 className="font-serif text-md font-bold text-primary leading-tight group-hover:text-secondary transition-colors">
-                    {m.name}
-                  </h5>
-                  <p className="text-[10px] uppercase font-mono tracking-wider text-[#737973]">
-                    {m.role}
-                  </p>
-                </div>
-              </button>
+              </motion.button>
             );
           })}
         </div>
       </div>
 
-      {/* Member Details Panel */}
+      {/* ACTIVE MEMBER DETAILS */}
       <AnimatePresence mode="wait">
         <motion.div
           key={selectedId}
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
+          exit={{ opacity: 0, y: -14 }}
           transition={{ duration: 0.35 }}
-          className="bg-white rounded-3xl p-6 md:p-8 border border-outline-variant/20 shadow-sm"
+          className="relative overflow-hidden rounded-[2rem] border border-[#edf1ee] bg-white p-7 md:p-8 shadow-[0_15px_60px_rgba(0,0,0,0.06)]"
         >
-          {/* Header row */}
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-6 border-b border-light-outline/10">
-            <div className="space-y-1.5Packed font-sans">
-              <span className="text-[10px] font-mono tracking-widest text-[#737973] uppercase leading-none">
-                Diagnostic Screen
-              </span>
-              <h3 className="font-serif text-3xl font-bold text-primary flex items-center gap-2">
-                {activeMember.name} Metrics
-                <span className="text-secondary-container bg-secondary/15 rounded-full px-2 py-0.5 text-xs font-bold">
-                  Health Index: {activeMember.healthScore}%
-                </span>
-              </h3>
-            </div>
+          {/* Ambient */}
+          <div className="absolute top-[-10%] right-[-10%] w-[260px] h-[260px] rounded-full bg-emerald-400/5 blur-[90px]" />
 
-            <div className="flex gap-2 w-full md:w-auto">
-              {/* Custom Ask Gemini about this person */}
+          <div className="relative z-10">
+            {/* Header */}
+            <div className="flex flex-col xl:flex-row justify-between xl:items-center gap-5 pb-8 border-b border-[#edf1ee]">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.22em] text-[#708277] font-mono mb-3">
+                  Diagnostic Overview
+                </p>
+
+                <div className="flex flex-wrap items-center gap-3">
+                  <h3 className="font-serif text-4xl text-[#07110c] font-semibold tracking-tight">
+                    {activeMember.name}
+                  </h3>
+
+                  <div className="px-4 py-2 rounded-full bg-emerald-400/10 border border-emerald-400/20 text-emerald-700 text-xs font-bold">
+                    Health Index: {activeMember.healthScore}%
+                  </div>
+                </div>
+              </div>
+
               <button
                 onClick={() =>
                   onAskAdvisor(
                     `What is the recommended vitamin D3 dosage and cognitive stack for my ${activeMember.role} (${activeMember.name}), considering their wellness goal of: ${activeMember.goal}?`,
                   )
                 }
-                className="flex-grow md:flex-grow-0 px-5 py-2.5 bg-primary text-white hover:bg-neutral-800 text-xs font-medium rounded-full transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                className="h-14 px-7 rounded-2xl bg-[#07110c] text-white hover:bg-black transition-all text-sm font-semibold flex items-center justify-center gap-3 cursor-pointer shadow-lg"
               >
-                <Sparkles className="w-3.5 h-3.5 text-secondary-container" />
+                <Sparkles className="w-4 h-4 text-emerald-300" />
                 Analyze Goals with AI
               </button>
             </div>
-          </div>
 
-          {/* Quick Metrics Bento Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-6">
-            {/* Metric Column 1: Core Goal */}
-            <div className="p-5 bg-cream/30 rounded-2xl border border-outline-variant/10 flex flex-col justify-between">
-              <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-mono tracking-widest text-outline uppercase">
-                  Active Target & Goal
-                </span>
-                <HeartPulse className="w-4 h-4 text-secondary" />
-              </div>
-              <div>
-                <p className="font-serif text-lg font-bold text-primary leading-tight mb-2">
+            {/* METRICS */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 pt-8">
+              {/* Goal */}
+              <div className="rounded-[1.8rem] border border-[#eef2ef] bg-[#f9fbfa] p-6">
+                <div className="flex items-center justify-between mb-8">
+                  <span className="text-[10px] uppercase tracking-[0.22em] text-[#708277] font-mono">
+                    Active Goal
+                  </span>
+
+                  <HeartPulse className="w-5 h-5 text-emerald-600" />
+                </div>
+
+                <h4 className="font-serif text-3xl leading-tight text-[#07110c]">
                   {activeMember.goal}
-                </p>
-                <div className="space-y-2 mt-4">
-                  <div className="flex justify-between text-xs font-semibold">
-                    <span>Adherence Progress</span>
-                    <span>{activeMember.progress}%</span>
+                </h4>
+
+                <div className="mt-8">
+                  <div className="flex justify-between text-sm mb-3">
+                    <span className="text-[#6b7d73] font-medium">Progress</span>
+
+                    <span className="font-bold text-[#07110c]">
+                      {activeMember.progress}%
+                    </span>
                   </div>
-                  <div className="w-full bg-[#fbf9f4] border border-outline-variant/20 h-2 rounded-full overflow-hidden">
+
+                  <div className="w-full h-3 rounded-full bg-white border border-[#e5ece8] overflow-hidden">
                     <motion.div
-                      className="h-full bg-secondary"
+                      className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-cyan-400"
                       initial={{ width: 0 }}
-                      animate={{ width: `${activeMember.progress}%` }}
+                      animate={{
+                        width: `${activeMember.progress}%`,
+                      }}
                       transition={{ duration: 1 }}
                     />
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Metric Column 2: System Levels */}
-            <div className="p-5 bg-cream/30 rounded-2xl border border-outline-variant/10 flex flex-col justify-between">
-              <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-mono tracking-widest text-outline uppercase">
-                  Genomic Parameters
-                </span>
-                <Activity className="w-4 h-4 text-primary" />
+              {/* Parameters */}
+              <div className="rounded-[1.8rem] border border-[#eef2ef] bg-[#f9fbfa] p-6">
+                <div className="flex items-center justify-between mb-8">
+                  <span className="text-[10px] uppercase tracking-[0.22em] text-[#708277] font-mono">
+                    Genomic Parameters
+                  </span>
+
+                  <Activity className="w-5 h-5 text-cyan-600" />
+                </div>
+
+                <div className="space-y-5">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#708277]">
+                      Physical Stamina
+                    </span>
+
+                    <div className="flex items-center gap-2 font-bold text-[#07110c]">
+                      <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                      {activeMember.stamina}
+                    </div>
+                  </div>
+
+                  <div className="w-full h-px bg-[#e8efea]" />
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#708277]">Deep Sleep</span>
+
+                    <span className="font-bold text-[#07110c]">
+                      {activeMember.sleepQuality}
+                    </span>
+                  </div>
+
+                  <div className="w-full h-px bg-[#e8efea]" />
+
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm text-[#708277]">
+                      Cellular Vitality
+                    </span>
+
+                    <span className="font-bold text-[#07110c]">
+                      {activeMember.coatHealth}
+                    </span>
+                  </div>
+                </div>
               </div>
 
-              <div className="space-y-3 font-sans">
-                <div className="flex justify-between items-center text-sm py-1.5 border-b border-outline-variant/10">
-                  <span className="text-outline font-medium text-xs">
-                    Physical Stamina
-                  </span>
-                  <span className="font-bold text-primary flex items-center gap-1.5">
-                    <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-                    {activeMember.stamina}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-sm py-1.5 border-b border-outline-variant/10">
-                  <span className="text-outline font-medium text-xs">
-                    Deep Sleep Latency
-                  </span>
-                  <span className="font-bold text-[#336d72]">
-                    {activeMember.sleepQuality}
-                  </span>
-                </div>
-                <div className="flex justify-between items-center text-sm py-1.5">
-                  <span className="text-outline font-medium text-xs">
-                    Cellular Vitality (Coat)
-                  </span>
-                  <span className="font-bold text-primary">
-                    {activeMember.coatHealth}
-                  </span>
+              {/* Scan */}
+              <div className="rounded-[1.8rem] border border-[#eef2ef] bg-[#07110c] p-6 text-white relative overflow-hidden">
+                <div className="absolute bottom-[-20%] right-[-20%] w-[180px] h-[180px] rounded-full bg-emerald-400/10 blur-[70px]" />
+
+                <div className="relative z-10">
+                  <div className="flex items-center justify-between mb-8">
+                    <span className="text-[10px] uppercase tracking-[0.22em] text-white/35 font-mono">
+                      Next Metabolic Scan
+                    </span>
+
+                    <Clock className="w-5 h-5 text-amber-400" />
+                  </div>
+
+                  <div className="flex items-end justify-center gap-2">
+                    <span className="text-7xl font-black text-white leading-none">
+                      {activeMember.nextScanDays}
+                    </span>
+
+                    <span className="text-sm font-semibold text-white/50 mb-2">
+                      Days
+                    </span>
+                  </div>
+
+                  <p className="mt-6 text-center text-sm leading-relaxed text-white/55">
+                    Clinical sensor delivery kit dispatched. Follow the dossier
+                    instructions before your next scan session.
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Metric Column 3: Maintenance Scans */}
-            <div className="p-5 bg-cream/30 rounded-2xl border border-outline-variant/10 flex flex-col justify-between">
-              <div className="flex justify-between items-start mb-4">
-                <span className="text-[10px] font-mono tracking-widest text-outline uppercase">
-                  Next Metabolic Scan
-                </span>
-                <Clock className="w-4 h-4 text-amber-600" />
+            {/* NOTICE */}
+            <div className="mt-8 rounded-[1.7rem] border border-emerald-400/20 bg-emerald-400/5 p-5 flex items-start gap-4">
+              <div className="w-11 h-11 rounded-2xl bg-emerald-400/10 border border-emerald-400/20 flex items-center justify-center shrink-0">
+                <Info className="w-5 h-5 text-emerald-700" />
               </div>
 
               <div>
-                <div className="text-center py-2">
-                  <span className="font-serif text-5xl font-extrabold text-primary">
-                    {activeMember.nextScanDays}
-                  </span>
-                  <span className="text-xs font-bold text-primary"> Days</span>
-                </div>
-                <p className="text-[11px] leading-snug text-center text-[#737973] mt-3">
-                  Automatic clinical sensor delivery kit dispatched. Please
-                  follow instructions in page dossier on day of scan.
+                <h4 className="text-sm font-bold text-[#07110c] mb-2">
+                  Clinical Directive
+                </h4>
+
+                <p className="text-sm leading-relaxed text-[#557062]">
+                  Supplement compliance has remained stable. Our Gemini module
+                  recommends augmenting mineral routines with{" "}
+                  <span className="font-semibold text-[#07110c]">
+                    200mg Metabolic Zinc Liposomal
+                  </span>{" "}
+                  during the dry winter session to support respiratory mucous
+                  integrity.
                 </p>
               </div>
-            </div>
-          </div>
-
-          {/* Expert Wellness Advice Prompt */}
-          <div className="mt-6 p-4 bg-secondary-container/10 border border-[#b2edf2]/40 rounded-2xl flex items-start gap-3">
-            <Info className="w-5 h-5 text-secondary shrink-0 mt-0.5" />
-            <div className="text-xs leading-relaxed text-[#336d72]">
-              <span className="font-bold text-primary">
-                Clinical Directive:
-              </span>{" "}
-              Supplement compliance has remained stable. Our server-side Gemini
-              module suggests augmenting daily mineral routines with{" "}
-              <b>200mg Metabolic Zinc Liposomal</b> during the dry winter
-              session to support respiratory mucous integrity.
             </div>
           </div>
         </motion.div>

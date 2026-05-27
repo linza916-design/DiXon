@@ -1,18 +1,6 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  Sparkles,
-  Gift,
-  Copy,
-  Check,
-  ArrowRight,
-  Clock,
-  CheckCircle2,
-  Heart,
-  Coins,
-  BadgePercent,
-  Banknote,
-} from "lucide-react";
+import { Sparkles, Gift, Copy, Check, CheckCircle2, Coins } from "lucide-react";
+
 import { Referral } from "../lib/types";
 import { initialReferrals } from "../lib/data";
 
@@ -25,197 +13,210 @@ export default function RewardsSharing({
   currentCredits,
   onRedeemCredits,
 }: RewardsSharingProps) {
-  const [referrals, setReferrals] = useState<Referral[]>(initialReferrals);
+  const [referrals] = useState<Referral[]>(initialReferrals);
   const [copiedLink, setCopiedLink] = useState(false);
   const [redeemAmount, setRedeemAmount] = useState<number>(20);
   const [redeemSuccess, setRedeemSuccess] = useState(false);
 
-  // Referral campaign links
   const referralLink = "https://dixon.com/welcome/jenkins55";
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(referralLink);
     setCopiedLink(true);
+
     setTimeout(() => setCopiedLink(false), 2000);
   };
 
   const handleRedeem = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (redeemAmount <= 0 || redeemAmount > currentCredits) return;
 
     onRedeemCredits(redeemAmount);
+
     setRedeemSuccess(true);
+
     setTimeout(() => {
       setRedeemSuccess(false);
     }, 3000);
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans">
-      {/* Rewards Campaign Intro Panel */}
-      <div className="lg:col-span-1 bg-gradient-to-br from-[#1b3022] to-primary text-white rounded-3xl p-6 md:p-8 flex flex-col justify-between relative overflow-hidden shadow-md">
-        {/* Glow ambient background circles */}
-        <div className="absolute top-[-20%] right-[-10%] w-60 h-60 bg-secondary/10 rounded-full blur-[70px]" />
+    <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 font-sans">
+      {/* LEFT FEATURE PANEL */}
 
-        <div className="relative space-y-4">
-          <div className="inline-flex p-3 bg-white/10 rounded-2xl">
-            <Gift className="w-6 h-6 text-secondary-container" />
+      <div className="xl:col-span-1 relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-800 p-8 shadow-2xl border border-white/10">
+        <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full bg-emerald-300/10 blur-[120px]" />
+        <div className="absolute -bottom-16 -left-16 w-60 h-60 rounded-full bg-teal-300/10 blur-[120px]" />
+
+        <div className="relative z-10 flex flex-col h-full justify-between">
+          <div className="space-y-6">
+            <div className="w-16 h-16 rounded-3xl bg-white/10 backdrop-blur-xl flex items-center justify-center border border-white/20">
+              <Gift className="w-8 h-8 text-emerald-200" />
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="font-serif text-4xl font-bold text-white leading-tight">
+                Share Wellness.
+                <br />
+                Earn Together.
+              </h3>
+
+              <p className="text-sm leading-relaxed text-emerald-100/85">
+                Invite families to trusted wellness transparency. Each completed
+                verification unlocks a shared
+                <span className="font-bold text-white"> $20 health credit</span>
+                .
+              </p>
+            </div>
           </div>
 
-          <h3 className="font-serif text-3xl font-extrabold text-[#fbf9f4]">
-            Share the Gift of Wellness
-          </h3>
+          <div className="pt-10 space-y-3">
+            <p className="text-[11px] uppercase tracking-[0.25em] text-emerald-200/70 font-semibold">
+              Private Referral Link
+            </p>
 
-          <p className="text-xs text-cream/80 leading-relaxed font-sans">
-            Introduce trusted medicine transparency to other families you care
-            about. When a family completes their initial verification scanner
-            diagnostic, both accounts receive a <b>$20.00 wellness credit</b>{" "}
-            automatically.
-          </p>
-        </div>
+            <div className="flex items-center justify-between bg-white/10 border border-white/15 backdrop-blur-xl rounded-2xl px-4 py-4">
+              <span className="truncate text-sm text-white/90 font-mono max-w-[190px]">
+                {referralLink}
+              </span>
 
-        <div className="relative pt-8 space-y-3 font-sans">
-          <p className="text-[10px] font-mono tracking-widest text-[#b2edf2]/80 uppercase leading-none">
-            Your Private Referral Link
-          </p>
-          <div className="flex h-11 bg-white/10 rounded-xl overflow-hidden border border-white/20 items-center justify-between px-3">
-            <span className="text-xs truncate font-mono text-cream-dark/95 w-44">
-              {referralLink}
-            </span>
-            <button
-              onClick={handleCopyLink}
-              className="p-1.5 hover:bg-white/20 rounded transition-colors cursor-pointer shrink-0 ml-1"
-            >
-              {copiedLink ? (
-                <Check className="w-4 h-4 text-[#b2edf2] animate-bounce" />
-              ) : (
-                <Copy className="w-4 h-4 text-[#fbf9f4]" />
-              )}
-            </button>
+              <button
+                onClick={handleCopyLink}
+                className="w-11 h-11 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all"
+              >
+                {copiedLink ? (
+                  <Check className="w-5 h-5 text-emerald-300" />
+                ) : (
+                  <Copy className="w-5 h-5 text-white" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Wellness credit account & Redemption portal */}
-      <div className="lg:col-span-2 space-y-6">
-        {/* Credit details visual bento */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Bento Slot 1: Credit Balance */}
-          <div className="bg-white rounded-3xl p-6 border border-outline-variant/20 shadow-sm flex flex-col justify-between relative overflow-hidden">
-            <div className="absolute top-4 right-4 text-emerald-600/10">
-              <Coins className="w-16 h-16" />
+      {/* RIGHT CONTENT */}
+
+      <div className="xl:col-span-2 space-y-8">
+        {/* CREDIT GRID */}
+
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* BALANCE */}
+
+          <div className="relative overflow-hidden rounded-[2rem] bg-white p-8 border border-zinc-200 shadow-xl">
+            <div className="absolute top-4 right-4 opacity-10">
+              <Coins className="w-28 h-28 text-emerald-700" />
             </div>
 
-            <div className="space-y-1 z-10 w-full font-sans">
-              <span className="text-[10px] font-mono tracking-widest uppercase text-outline block leading-none">
+            <div className="space-y-3 relative z-10">
+              <p className="text-[11px] tracking-[0.25em] uppercase text-zinc-500 font-semibold">
                 Available Credits
-              </span>
-              <h2 className="font-serif text-5xl font-extrabold text-primary">
+              </p>
+
+              <h2 className="font-serif text-6xl font-bold text-zinc-900">
                 ${currentCredits.toFixed(2)}
               </h2>
-            </div>
 
-            <div className="pt-4 flex items-center gap-1 text-[11px] font-bold text-secondary font-sans leading-relaxed">
-              <Sparkles className="w-3.5 h-3.5" /> Applied automatically at
-              check-out
+              <div className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-700 bg-emerald-50 px-4 py-2 rounded-full">
+                <Sparkles className="w-4 h-4" />
+                Auto-applied at checkout
+              </div>
             </div>
           </div>
 
-          {/* Bento Slot 2: Redeem Credit Interactive Tool */}
-          <div className="bg-white rounded-3xl p-6 border border-outline-variant/20 shadow-sm flex flex-col justify-between">
-            <div className="space-y-1.5 mb-4">
-              <span className="text-[10px] font-mono tracking-widest uppercase text-outline block leading-none">
-                Redeem Portal
-              </span>
-              <h4 className="font-serif text-md font-bold text-primary">
-                Apply Credits to Next Order
-              </h4>
-            </div>
+          {/* REDEEM */}
 
-            <form onSubmit={handleRedeem} className="space-y-3 font-sans">
-              <div className="flex gap-2 h-11 items-center">
-                <div className="relative flex-1">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 font-bold text-primary text-sm">
-                    $
-                  </span>
-                  <input
-                    type="number"
-                    min="5"
-                    max={currentCredits}
-                    value={redeemAmount}
-                    onChange={(e) =>
-                      setRedeemAmount(
-                        Math.min(
-                          currentCredits,
-                          Math.max(0, Number(e.target.value)),
-                        ),
-                      )
-                    }
-                    className="w-full h-11 pl-7 pr-3 bg-cream/30 border border-outline-variant/20 rounded-xl focus:border-secondary text-sm font-bold focus:ring-1 focus:ring-secondary/50 outline-none"
-                    placeholder="20"
-                  />
-                </div>
+          <div className="rounded-[2rem] bg-white p-8 border border-zinc-200 shadow-xl">
+            <p className="text-[11px] tracking-[0.25em] uppercase text-zinc-500 font-semibold">
+              Redeem Credits
+            </p>
 
-                <button
-                  type="submit"
-                  disabled={
-                    redeemAmount <= 0 ||
-                    redeemAmount > currentCredits ||
-                    redeemSuccess
-                  }
-                  className="px-5 h-11 bg-primary text-white hover:bg-neutral-800 disabled:bg-primary/45 disabled:cursor-not-allowed hover:opacity-90 font-bold rounded-xl text-xs transition-colors cursor-pointer whitespace-nowrap active:scale-95"
-                >
-                  {redeemSuccess ? "Applied ✓" : "Redeem"}
-                </button>
-              </div>
+            <h4 className="font-serif text-2xl font-bold text-zinc-900 mt-3">
+              Apply To Next Order
+            </h4>
+
+            <form onSubmit={handleRedeem} className="space-y-4 mt-8">
+              <input
+                type="number"
+                min="5"
+                max={currentCredits}
+                value={redeemAmount}
+                onChange={(e) =>
+                  setRedeemAmount(
+                    Math.min(
+                      currentCredits,
+                      Math.max(0, Number(e.target.value)),
+                    ),
+                  )
+                }
+                className="w-full h-14 rounded-2xl border border-zinc-200 px-5 text-lg font-bold outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+
+              <button
+                type="submit"
+                disabled={
+                  redeemAmount <= 0 ||
+                  redeemAmount > currentCredits ||
+                  redeemSuccess
+                }
+                className="w-full h-14 rounded-2xl bg-zinc-900 hover:bg-zinc-800 text-white font-bold transition-all disabled:opacity-40"
+              >
+                {redeemSuccess ? "Applied ✓" : "Redeem Credits"}
+              </button>
 
               {redeemSuccess && (
-                <p className="text-[11px] font-bold text-green-700 flex items-center gap-1.5 animate-pulse leading-none pt-0.5">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Applied! Check your
-                  active cart or next order discount.
+                <p className="flex items-center gap-2 text-sm text-emerald-700 font-semibold">
+                  <CheckCircle2 className="w-4 h-4" />
+                  Credits successfully applied
                 </p>
               )}
             </form>
           </div>
         </div>
 
-        {/* History Stream references list */}
-        <div className="bg-white rounded-3xl p-6 md:p-8 border border-outline-variant/20 shadow-sm space-y-4">
-          <div className="flex justify-between items-center">
-            <h4 className="font-serif text-lg font-bold text-primary">
-              Referral Track history
+        {/* HISTORY */}
+
+        <div className="rounded-[2rem] bg-white border border-zinc-200 shadow-xl p-8">
+          <div className="flex justify-between items-center mb-8">
+            <h4 className="font-serif text-2xl font-bold text-zinc-900">
+              Referral History
             </h4>
-            <span className="text-[11px] font-semibold text-secondary flex items-center gap-1 font-sans">
-              <Coins className="w-3.5 h-3.5" /> 3 Referrals Registered
-            </span>
+
+            <div className="flex items-center gap-2 text-sm font-semibold text-emerald-700">
+              <Coins className="w-4 h-4" />
+              {referrals.length} Registered
+            </div>
           </div>
 
-          <div className="divide-y divide-light-outline/10 text-xs">
+          <div className="divide-y divide-zinc-100">
             {referrals.map((ref) => (
               <div
                 key={ref.id}
-                className="flex justify-between items-center py-3.5 first:pt-0 last:pb-0"
+                className="py-5 flex justify-between items-center"
               >
-                <div className="space-y-1 font-sans">
-                  <p className="font-bold text-primary">{ref.name}</p>
-                  <p className="text-[10px] text-outline">
-                    Registered on {ref.joinedDate}
+                <div>
+                  <p className="font-bold text-zinc-900">{ref.name}</p>
+
+                  <p className="text-sm text-zinc-500">
+                    Joined {ref.joinedDate}
                   </p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                   <span
-                    className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
+                    className={`px-4 py-2 rounded-full text-xs font-bold ${
                       ref.status === "Successful"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-orange-100 text-orange-700 animate-pulse"
+                        ? "bg-emerald-100 text-emerald-700"
+                        : "bg-amber-100 text-amber-700"
                     }`}
                   >
                     {ref.status}
                   </span>
 
-                  <span className="font-mono font-bold text-primary text-sm">
-                    +${ref.credit.toFixed(2)}
+                  <span className="font-bold text-lg text-zinc-900">
+                    +$
+                    {ref.credit.toFixed(2)}
                   </span>
                 </div>
               </div>

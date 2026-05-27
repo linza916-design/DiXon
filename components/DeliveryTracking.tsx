@@ -1,340 +1,653 @@
-import React, { useState } from "react";
-import { motion } from "framer-motion";
+"use client";
+
+import React, { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Truck,
-  MapPin,
-  CheckCircle,
-  Calendar,
-  ChevronRight,
-  History,
+  PackageCheck,
   Copy,
   Check,
-  ShieldCheck,
-  AlertCircle,
-  Clock,
   Navigation,
+  AlertCircle,
+  CheckCircle2,
+  ShieldCheck,
+  Clock3,
+  MapPin,
+  Sparkles,
+  ChevronRight,
 } from "lucide-react";
-import { Order } from "../lib/types";
-import { initialOrders } from "../lib/data";
+
+interface OrderItem {
+  id: string;
+  title: string;
+  qty: number;
+}
+
+interface Order {
+  id: string;
+  orderNumber: string;
+  status: "Processing" | "In Transit" | "Delivered";
+  date: string;
+  carrier: string;
+  trackingNumber: string;
+  stepperIndex: number;
+  eta: string;
+  shippingAddress: {
+    name: string;
+    line1: string;
+    cityStateZip: string;
+  };
+  items: OrderItem[];
+}
+
+const initialOrders: Order[] = [
+  {
+    id: "o-1",
+    orderNumber: "DX-20491",
+    status: "In Transit",
+    date: "Sep 24",
+    carrier: "DiXon Premium Logistics",
+    trackingNumber: "DIX-PL-88A291",
+    stepperIndex: 4,
+    eta: "Arriving Today",
+    shippingAddress: {
+      name: "Sarah Jenkins",
+      line1: "221 Wellness Avenue",
+      cityStateZip: "Seattle, WA 98109",
+    },
+    items: [
+      { id: "i1", title: "Liposomal Zinc", qty: 2 },
+      { id: "i2", title: "Omega Complex", qty: 1 },
+    ],
+  },
+  {
+    id: "o-2",
+    orderNumber: "DX-20488",
+    status: "Processing",
+    date: "Sep 22",
+    carrier: "Clinical Freight",
+    trackingNumber: "DIX-CL-73P182",
+    stepperIndex: 2,
+    eta: "Ships Tomorrow",
+    shippingAddress: {
+      name: "Sarah Jenkins",
+      line1: "221 Wellness Avenue",
+      cityStateZip: "Seattle, WA 98109",
+    },
+    items: [
+      { id: "i3", title: "Active Magnesium", qty: 1 },
+      { id: "i4", title: "Vitamin D3", qty: 2 },
+      { id: "i5", title: "Probiotic Formula", qty: 1 },
+    ],
+  },
+  {
+    id: "o-3",
+    orderNumber: "DX-20471",
+    status: "Delivered",
+    date: "Sep 18",
+    carrier: "DiXon Shield Carrier",
+    trackingNumber: "DIX-SH-11K812",
+    stepperIndex: 5,
+    eta: "Delivered",
+    shippingAddress: {
+      name: "Sarah Jenkins",
+      line1: "221 Wellness Avenue",
+      cityStateZip: "Seattle, WA 98109",
+    },
+    items: [{ id: "i6", title: "Immunity Stack", qty: 1 }],
+  },
+];
 
 export default function DeliveryTracking() {
-  const [orders, setOrders] = useState<Order[]>(initialOrders);
+  const [orders] = useState<Order[]>(initialOrders);
   const [selectedOrderId, setSelectedOrderId] = useState<string>("o-1");
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const activeOrder = orders.find((o) => o.id === selectedOrderId) || orders[0];
+  const activeOrder = useMemo(
+    () => orders.find((o) => o.id === selectedOrderId) || initialOrders[0],
+    [orders, selectedOrderId],
+  );
 
-  const handleCopyCode = (code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedId(code);
-    setTimeout(() => setCopiedId(null), 2000);
+  const handleCopyCode = async (code: string) => {
+    try {
+      await navigator.clipboard.writeText(code);
+      setCopiedId(code);
+
+      setTimeout(() => {
+        setCopiedId(null);
+      }, 1800);
+    } catch (error) {
+      console.error("Failed to copy tracking code:", error);
+    }
   };
 
   const steps = [
     {
       title: "Order Placed",
-      date: "Sep 22, 11:30 AM",
-      desc: "Successfully authorized via Flutterwave Client.",
+      date: "Sep 22 · 11:30 AM",
+      desc: "Secure payment verified through Flutterwave.",
     },
     {
-      title: "Processing & Tested",
-      date: "Sep 23, 09:12 AM",
-      desc: "Batch tested for purity in Dixon sterile labs.",
+      title: "Lab Processing",
+      date: "Sep 23 · 09:12 AM",
+      desc: "Supplement batch screened in sterile facilities.",
     },
     {
-      title: "Dispatched from Hub",
-      date: "Sep 23, 02:40 PM",
-      desc: "Released to Premium Logistics with courier scan.",
+      title: "Courier Dispatch",
+      date: "Sep 23 · 02:40 PM",
+      desc: "Shipment released to premium logistics partner.",
     },
     {
       title: "In Transit",
-      date: "Sep 24, 08:00 AM",
-      desc: "Courier vehicle is nearby on route.",
+      date: "Sep 24 · 08:00 AM",
+      desc: "Vehicle is currently active within your route zone.",
     },
     {
-      title: "Delivered Shield",
+      title: "Delivered",
       date: "Pending",
-      desc: "Requires member signature or OTP scan.",
+      desc: "Requires OTP confirmation and secure handoff.",
     },
   ];
 
-  const activeStep = activeOrder.stepperIndex; // e.g. 3 corresponds to Step 4 "In Transit" (0-indexed)
-
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 font-sans">
-      {/* Side Panel: Shipment selector & Details */}
-      <div className="lg:col-span-1 space-y-5">
-        {/* Active tracking cards */}
-        <div className="bg-white rounded-3xl p-5 md:p-6 border border-outline-variant/20 shadow-sm space-y-4">
-          <span className="text-[10px] font-mono tracking-widest text-[#737973] uppercase block mb-3">
-            Shipment Dossier
-          </span>
+    <div className="min-h-screen bg-[#06110b] text-white relative overflow-hidden">
+      {/* Ambient Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[-12rem] right-[-10rem] h-[30rem] w-[30rem] rounded-full bg-emerald-500/10 blur-3xl" />
+        <div className="absolute bottom-[-10rem] left-[-10rem] h-[28rem] w-[28rem] rounded-full bg-cyan-400/10 blur-3xl" />
 
-          <div className="space-y-3">
-            {orders.map((o) => {
-              const isSelected = o.id === selectedOrderId;
-              return (
-                <button
-                  key={o.id}
-                  onClick={() => setSelectedOrderId(o.id)}
-                  className={`w-full p-4 rounded-2xl border text-left transition-colors cursor-pointer flex items-center justify-between ${
-                    isSelected
-                      ? "bg-primary text-white border-primary"
-                      : "bg-cream/40 border-outline-variant/15 hover:bg-cream text-primary"
-                  }`}
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-1">
-                      <Truck
-                        className={`w-4 h-4 ${isSelected ? "text-secondary-container" : "text-secondary"}`}
-                      />
-                      <span className="text-xs font-mono font-bold">
-                        {o.orderNumber}
-                      </span>
-                    </div>
-                    <div
-                      className={`text-[10px] ${isSelected ? "text-cream/80" : "text-outline"}`}
-                    >
-                      {o.date} • {o.items.length} items
-                    </div>
-                  </div>
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.03),transparent_60%)]" />
+      </div>
 
-                  <span
-                    className={`text-[10px] font-bold px-2.5 py-1 rounded-full ${
-                      isSelected
-                        ? "bg-white/10 text-[#b2edf2] border border-white/20"
-                        : o.status === "Delivered"
-                          ? "bg-green-100 text-green-700"
-                          : "bg-amber-100 text-amber-700"
-                    }`}
-                  >
-                    {o.status}
-                  </span>
-                </button>
-              );
-            })}
+      <div className="relative z-10 max-w-7xl mx-auto px-5 md:px-8 py-8">
+        {/* Hero Header */}
+        <div className="mb-8">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[11px] uppercase tracking-[0.22em] text-emerald-300 backdrop-blur-xl">
+            <Sparkles className="w-3.5 h-3.5" />
+            Premium Delivery Tracking
           </div>
-        </div>
 
-        {/* Deliver Address Details Card */}
-        <div className="bg-white rounded-3xl p-5 md:p-6 border border-outline-variant/20 shadow-sm space-y-4 text-xs">
-          <span className="text-[10px] font-mono tracking-widest text-[#737973] uppercase block mb-1">
-            Shipping Details
-          </span>
-          <div className="space-y-3 font-sans">
+          <div className="mt-5 flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
             <div>
-              <p className="font-bold text-primary mb-1">Consignee</p>
-              <p className="text-outline">{activeOrder.shippingAddress.name}</p>
-            </div>
-            <div>
-              <p className="font-bold text-primary mb-1">Destination Address</p>
-              <p className="text-outline">
-                {activeOrder.shippingAddress.line1}
-              </p>
-              <p className="text-outline">
-                {activeOrder.shippingAddress.cityStateZip}
+              <h1 className="font-serif text-4xl md:text-6xl font-semibold tracking-tight text-white leading-none">
+                Shipment Intelligence
+              </h1>
+
+              <p className="mt-4 text-sm md:text-base text-white/55 max-w-2xl leading-relaxed">
+                Monitor every supplement shipment with real-time logistics,
+                molecular integrity handling, and secure delivery verification.
               </p>
             </div>
-            <div>
-              <p className="font-bold text-primary mb-0.5">Carrier Service</p>
-              <p className="text-outline">{activeOrder.carrier}</p>
-            </div>
-            <div>
-              <p className="font-bold text-primary mb-1">
-                Waybill tracking code
-              </p>
-              <div className="flex items-center gap-2">
-                <span className="font-mono bg-cream/60 py-1 px-2.5 rounded border border-outline-variant/10 text-primary">
-                  {activeOrder.trackingNumber}
-                </span>
-                <button
-                  onClick={() => handleCopyCode(activeOrder.trackingNumber)}
-                  className="p-1.5 hover:bg-primary/5 rounded transition-colors cursor-pointer"
-                >
-                  {copiedId === activeOrder.trackingNumber ? (
-                    <Check className="w-3.5 h-3.5 text-green-600 animate-pulse" />
-                  ) : (
-                    <Copy className="w-3.5 h-3.5 text-outline" />
-                  )}
-                </button>
+
+            <div className="flex items-center gap-3 rounded-3xl border border-emerald-500/20 bg-emerald-500/10 px-5 py-4 backdrop-blur-xl">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-400/15">
+                <ShieldCheck className="w-6 h-6 text-emerald-300" />
+              </div>
+
+              <div>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-200/70">
+                  Active Security Layer
+                </p>
+                <p className="text-sm font-semibold text-white">
+                  Clinical Chain Protected
+                </p>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Main interactive tracking route view */}
-      <div className="lg:col-span-2 space-y-6">
-        {/* Live Map vector representation */}
-        <div className="bg-white rounded-3xl overflow-hidden border border-outline-variant/20 shadow-sm flex flex-col justify-between h-[230px] p-6 relative">
-          {/* Cover map grid design */}
-          <div className="absolute inset-0 bg-[#f4f7f5] grid grid-cols-6 grid-rows-4 gap-1 opacity-25 p-2 pointer-events-none">
-            {[...Array(24)].map((_, i) => (
-              <div
-                key={i}
-                className="border border-outline-variant/10 rounded-sm"
-              />
-            ))}
-          </div>
+        {/* Main Layout */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          {/* Sidebar */}
+          <div className="space-y-6">
+            {/* Orders */}
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-5 md:p-6">
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.22em] text-white/40">
+                    Shipment Queue
+                  </p>
 
-          <div className="relative flex justify-between items-start z-10 w-full">
-            <div>
-              <span className="text-[9px] font-mono tracking-widest uppercase text-outline block leading-none mb-1">
-                Live Courier Dispatch
-              </span>
-              <h4 className="font-serif text-xl font-bold text-primary flex items-center gap-1.5 leading-none">
-                In Transit - Route Active
-                <span className="inline-block w-2 h-2 bg-green-500 rounded-full animate-ping" />
-              </h4>
-            </div>
+                  <h3 className="mt-1 text-xl font-semibold">Active Orders</h3>
+                </div>
 
-            <span className="text-[10px] font-mono bg-white px-2.5 py-1 rounded-full border border-outline-variant/15 text-primary flex items-center gap-1">
-              <Navigation className="w-3 h-3 text-secondary" />
-              0.8 miles away
-            </span>
-          </div>
+                <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                  <Truck className="w-5 h-5 text-emerald-300" />
+                </div>
+              </div>
 
-          {/* SVG Map route track */}
-          <div className="relative flex items-center justify-center flex-1 h-20 w-full z-10 py-6">
-            <svg
-              className="w-full max-w-lg h-12"
-              viewBox="0 0 400 30"
-              fill="none"
-            >
-              {/* Route line */}
-              <line
-                x1="20"
-                y1="15"
-                x2="380"
-                y2="15"
-                stroke="#eae8e3"
-                strokeWidth="4"
-                strokeLinecap="round"
-              />
-              {/* Highlight completed path */}
-              <line
-                x1="20"
-                y1="15"
-                x2="260"
-                y2="15"
-                stroke="#2c676c"
-                strokeWidth="4"
-                strokeLinecap="round"
-              />
+              <div className="space-y-3">
+                {orders.map((order) => {
+                  const selected = order.id === selectedOrderId;
 
-              {/* Starting warehouse anchor */}
-              <circle cx="20" cy="15" r="8" fill="#061b0e" />
-              <circle cx="20" cy="15" r="4" fill="#fbf9f4" />
-
-              {/* Current truck location */}
-              <g transform="translate(250, 0)">
-                <ellipse
-                  cx="10"
-                  cy="15"
-                  rx="14"
-                  ry="10"
-                  fill="#2c676c"
-                  className="animate-pulse"
-                />
-                <path
-                  d="M6 15h8M8 12h4"
-                  stroke="#ffffff"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </g>
-
-              {/* Delivery destination house */}
-              <circle cx="380" cy="15" r="8" fill="#737973" />
-              <circle cx="380" cy="15" r="4" fill="#fbf9f4" />
-            </svg>
-
-            {/* Courier Labels floating */}
-            <span className="absolute left-[3%] bottom-0 text-[9px] font-mono uppercase text-[#737973]">
-              Origin Hub
-            </span>
-            <span className="absolute left-[60%] bottom-0 text-[9px] font-bold text-secondary flex items-center gap-1">
-              Active Vehicle PLE-88
-            </span>
-            <span className="absolute right-[3%] bottom-0 text-[9px] font-mono uppercase text-[#737973]">
-              Sarah's Suite
-            </span>
-          </div>
-        </div>
-
-        {/* Stepper details */}
-        <div className="bg-white rounded-3xl p-6 md:p-8 border border-outline-variant/20 shadow-sm relative space-y-6">
-          <span className="text-[10px] font-mono tracking-widest text-[#737973] uppercase block mb-2">
-            Transit Timeline
-          </span>
-
-          <div className="space-y-6 relative before:absolute before:left-[17px] before:top-2 before:bottom-2 before:w-0.5 before:bg-cream-dark">
-            {steps.map((st, sIdx) => {
-              const checkCompleted = sIdx < activeStep;
-              const checkCurrent = sIdx === activeStep - 1;
-
-              return (
-                <div
-                  key={sIdx}
-                  className="flex gap-6 items-start relative z-10"
-                >
-                  {/* Stepper Indicator bubble */}
-                  <div
-                    className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 border-2 transition-all ${
-                      checkCompleted
-                        ? "bg-secondary border-secondary text-white"
-                        : checkCurrent
-                          ? "bg-white border-primary text-primary shadow-md ring-4 ring-primary/5 scale-105"
-                          : "bg-white border-cream-dark text-[#737973]"
-                    }`}
-                  >
-                    {checkCompleted ? (
-                      <CheckCircle className="w-5 h-5 text-white" />
-                    ) : (
-                      <span className="text-xs font-mono font-bold">
-                        {sIdx + 1}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Stepper details */}
-                  <div className="space-y-0.5">
-                    <div className="flex gap-2 items-baseline">
-                      <h5
-                        className={`font-serif text-md font-bold leading-none ${
-                          checkCompleted || checkCurrent
-                            ? "text-primary"
-                            : "text-outline/80 font-normal"
-                        }`}
-                      >
-                        {st.title}
-                      </h5>
-                      <span className="text-[10px] font-mono text-[#737973] uppercase whitespace-nowrap">
-                        {st.date}
-                      </span>
-                    </div>
-                    <p
-                      className={`text-xs ${
-                        checkCurrent
-                          ? "text-primary font-medium"
-                          : "text-outline"
+                  return (
+                    <motion.button
+                      whileTap={{ scale: 0.98 }}
+                      key={order.id}
+                      onClick={() => setSelectedOrderId(order.id)}
+                      className={`w-full rounded-3xl p-4 text-left transition-all border ${
+                        selected
+                          ? "border-emerald-400/40 bg-gradient-to-br from-emerald-400/20 to-cyan-400/10 shadow-[0_0_30px_rgba(16,185,129,0.15)]"
+                          : "border-white/8 bg-white/[0.03] hover:bg-white/[0.06]"
                       }`}
                     >
-                      {st.desc}
-                    </p>
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <Truck
+                              className={`w-4 h-4 ${
+                                selected ? "text-emerald-300" : "text-white/50"
+                              }`}
+                            />
+
+                            <span className="font-mono text-xs font-bold tracking-wider">
+                              {order.orderNumber}
+                            </span>
+                          </div>
+
+                          <p
+                            className={`mt-2 text-xs ${
+                              selected ? "text-white/70" : "text-white/45"
+                            }`}
+                          >
+                            {order.date} • {order.items.length} Items
+                          </p>
+                        </div>
+
+                        <div
+                          className={`rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                            order.status === "Delivered"
+                              ? "bg-emerald-500/15 text-emerald-300 border border-emerald-400/20"
+                              : order.status === "In Transit"
+                                ? "bg-cyan-500/15 text-cyan-300 border border-cyan-400/20"
+                                : "bg-amber-500/15 text-amber-300 border border-amber-400/20"
+                          }`}
+                        >
+                          {order.status}
+                        </div>
+                      </div>
+
+                      <div className="mt-4 flex items-center justify-between">
+                        <span className="text-xs text-white/50">
+                          ETA: {order.eta}
+                        </span>
+
+                        <ChevronRight className="w-4 h-4 text-white/35" />
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Shipping Details */}
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-5 md:p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.22em] text-white/40">
+                    Delivery Details
+                  </p>
+
+                  <h3 className="mt-1 text-xl font-semibold">Destination</h3>
+                </div>
+
+                <div className="h-10 w-10 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                  <MapPin className="w-5 h-5 text-cyan-300" />
+                </div>
+              </div>
+
+              <div className="mt-6 space-y-5">
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-white/35 mb-1">
+                    Consignee
+                  </p>
+
+                  <p className="font-medium text-white">
+                    {activeOrder.shippingAddress.name}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-white/35 mb-1">
+                    Address
+                  </p>
+
+                  <p className="text-sm text-white/70 leading-relaxed">
+                    {activeOrder.shippingAddress.line1}
+                    <br />
+                    {activeOrder.shippingAddress.cityStateZip}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-white/35 mb-1">
+                    Carrier
+                  </p>
+
+                  <p className="text-sm text-white/70">{activeOrder.carrier}</p>
+                </div>
+
+                <div>
+                  <p className="text-[11px] uppercase tracking-wider text-white/35 mb-2">
+                    Tracking Code
+                  </p>
+
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 rounded-2xl border border-white/10 bg-black/20 px-4 py-3 font-mono text-xs tracking-wider text-emerald-300 overflow-hidden">
+                      {activeOrder.trackingNumber}
+                    </div>
+
+                    <button
+                      onClick={() => handleCopyCode(activeOrder.trackingNumber)}
+                      className="h-12 w-12 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition-all flex items-center justify-center"
+                    >
+                      {copiedId === activeOrder.trackingNumber ? (
+                        <Check className="w-4 h-4 text-emerald-300" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-white/60" />
+                      )}
+                    </button>
                   </div>
                 </div>
-              );
-            })}
+              </div>
+            </div>
           </div>
 
-          <div className="p-4 bg-amber-50 rounded-2xl border border-amber-100 flex items-start gap-2.5">
-            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-            <div className="text-xs text-amber-900 leading-normal">
-              <span className="font-bold">Member Purity Verification:</span>{" "}
-              This package holds clinical diagnostics sample collection vials.
-              Please store the test boxes in cooling chambers upon reception
-              directly. No raw freeze needed.
+          {/* Main Content */}
+          <div className="xl:col-span-2 space-y-6">
+            {/* Live Route */}
+            <div className="rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.02] backdrop-blur-2xl overflow-hidden p-6 md:p-8 relative">
+              {/* grid */}
+              <div className="absolute inset-0 opacity-[0.07]">
+                <div className="grid grid-cols-8 grid-rows-6 h-full w-full">
+                  {Array.from({ length: 48 }).map((_, i) => (
+                    <div key={i} className="border border-white/10" />
+                  ))}
+                </div>
+              </div>
+
+              <div className="relative z-10">
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-5">
+                  <div>
+                    <p className="text-[11px] uppercase tracking-[0.22em] text-white/40">
+                      Live Courier Route
+                    </p>
+
+                    <h2 className="mt-2 font-serif text-3xl md:text-4xl font-semibold flex items-center gap-3">
+                      In Transit
+                      <span className="relative flex h-3 w-3">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex h-3 w-3 rounded-full bg-emerald-300"></span>
+                      </span>
+                    </h2>
+
+                    <p className="mt-3 max-w-xl text-sm text-white/55 leading-relaxed">
+                      Your courier is currently navigating the final delivery
+                      route with environmental temperature monitoring enabled.
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3">
+                    <div className="flex items-center gap-2 text-cyan-200">
+                      <Navigation className="w-4 h-4" />
+
+                      <span className="text-xs uppercase tracking-wider font-semibold">
+                        0.8 Miles Away
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Route SVG */}
+                <div className="mt-10 relative">
+                  <svg
+                    className="w-full h-[140px]"
+                    viewBox="0 0 900 140"
+                    fill="none"
+                  >
+                    {/* Base Route */}
+                    <path
+                      d="M60 70 C 200 70, 220 40, 360 70 S 560 100, 700 70 S 820 40, 860 70"
+                      stroke="rgba(255,255,255,0.12)"
+                      strokeWidth="8"
+                      strokeLinecap="round"
+                    />
+
+                    {/* Active Path */}
+                    <motion.path
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 0.72 }}
+                      transition={{ duration: 2 }}
+                      d="M60 70 C 200 70, 220 40, 360 70 S 560 100, 700 70 S 820 40, 860 70"
+                      stroke="url(#gradient)"
+                      strokeWidth="8"
+                      strokeLinecap="round"
+                    />
+
+                    <defs>
+                      <linearGradient
+                        id="gradient"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="0%"
+                      >
+                        <stop offset="0%" stopColor="#10b981" />
+                        <stop offset="100%" stopColor="#22d3ee" />
+                      </linearGradient>
+                    </defs>
+
+                    {/* Start */}
+                    <circle cx="60" cy="70" r="14" fill="#10b981" />
+
+                    {/* Vehicle */}
+                    <motion.g
+                      animate={{
+                        x: [0, 15, 0],
+                      }}
+                      transition={{
+                        duration: 2,
+                        repeat: Infinity,
+                      }}
+                    >
+                      <circle
+                        cx="620"
+                        cy="82"
+                        r="22"
+                        fill="#0f172a"
+                        stroke="#22d3ee"
+                        strokeWidth="4"
+                      />
+
+                      <Truck
+                        x={608}
+                        y={70}
+                        width={24}
+                        height={24}
+                        color="#ffffff"
+                      />
+                    </motion.g>
+
+                    {/* Destination */}
+                    <circle
+                      cx="860"
+                      cy="70"
+                      r="14"
+                      fill="#ffffff"
+                      opacity="0.5"
+                    />
+                  </svg>
+
+                  <div className="flex justify-between mt-2 text-[11px] uppercase tracking-[0.18em] text-white/40">
+                    <span>Origin Hub</span>
+                    <span className="text-cyan-300">Vehicle PLE-88</span>
+                    <span>Sarah's Suite</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Timeline */}
+            <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-6 md:p-8">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.22em] text-white/40">
+                    Delivery Timeline
+                  </p>
+
+                  <h3 className="mt-2 text-2xl font-semibold">
+                    Transit Progress
+                  </h3>
+                </div>
+
+                <div className="hidden md:flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2">
+                  <Clock3 className="w-4 h-4 text-amber-300" />
+                  <span className="text-xs text-white/70">
+                    Updated 2 mins ago
+                  </span>
+                </div>
+              </div>
+
+              <div className="mt-10 relative">
+                <div className="absolute left-[18px] top-0 bottom-0 w-px bg-white/10" />
+
+                <div className="space-y-8">
+                  {steps.map((step, index) => {
+                    const completed = index < activeOrder.stepperIndex - 1;
+
+                    const current = index === activeOrder.stepperIndex - 1;
+
+                    return (
+                      <motion.div
+                        initial={{ opacity: 0, x: -12 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: index * 0.08 }}
+                        key={index}
+                        className="relative flex gap-5"
+                      >
+                        <div
+                          className={`relative z-10 h-10 w-10 rounded-full border flex items-center justify-center ${
+                            completed
+                              ? "bg-emerald-500 border-emerald-400"
+                              : current
+                                ? "bg-cyan-400/10 border-cyan-300 shadow-[0_0_25px_rgba(34,211,238,0.3)]"
+                                : "bg-black/20 border-white/10"
+                          }`}
+                        >
+                          {completed ? (
+                            <CheckCircle2 className="w-5 h-5 text-white" />
+                          ) : (
+                            <span
+                              className={`text-xs font-bold ${
+                                current ? "text-cyan-200" : "text-white/50"
+                              }`}
+                            >
+                              {index + 1}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex-1">
+                          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                            <h4
+                              className={`font-semibold text-lg ${
+                                completed || current
+                                  ? "text-white"
+                                  : "text-white/45"
+                              }`}
+                            >
+                              {step.title}
+                            </h4>
+
+                            <span className="text-[11px] uppercase tracking-[0.18em] text-white/35">
+                              {step.date}
+                            </span>
+                          </div>
+
+                          <p
+                            className={`mt-2 text-sm leading-relaxed ${
+                              current ? "text-cyan-100" : "text-white/50"
+                            }`}
+                          >
+                            {step.desc}
+                          </p>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Alert */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeOrder.id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 12 }}
+                  className="mt-10 rounded-3xl border border-amber-400/20 bg-amber-500/10 p-5 flex items-start gap-4"
+                >
+                  <div className="h-12 w-12 rounded-2xl bg-amber-400/10 flex items-center justify-center shrink-0">
+                    <AlertCircle className="w-5 h-5 text-amber-300" />
+                  </div>
+
+                  <div>
+                    <h5 className="font-semibold text-amber-100">
+                      Temperature Sensitive Delivery
+                    </h5>
+
+                    <p className="mt-1 text-sm leading-relaxed text-amber-100/70">
+                      This package contains active wellness compounds and
+                      diagnostic materials. Store in a cool environment
+                      immediately after reception.
+                    </p>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Bottom Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+              {[
+                {
+                  icon: PackageCheck,
+                  title: "Package Integrity",
+                  value: "98.8%",
+                  desc: "Environmental stability maintained.",
+                },
+                {
+                  icon: ShieldCheck,
+                  title: "Security Validation",
+                  value: "Protected",
+                  desc: "Biometric delivery confirmation active.",
+                },
+                {
+                  icon: Clock3,
+                  title: "Estimated Arrival",
+                  value: activeOrder.eta,
+                  desc: "Dynamic route optimization enabled.",
+                },
+              ].map((card, idx) => (
+                <motion.div
+                  key={idx}
+                  whileHover={{ y: -4 }}
+                  className="rounded-[2rem] border border-white/10 bg-white/[0.04] backdrop-blur-2xl p-5"
+                >
+                  <div className="h-12 w-12 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center">
+                    <card.icon className="w-5 h-5 text-emerald-300" />
+                  </div>
+
+                  <p className="mt-5 text-[11px] uppercase tracking-[0.2em] text-white/40">
+                    {card.title}
+                  </p>
+
+                  <h4 className="mt-2 text-2xl font-semibold">{card.value}</h4>
+
+                  <p className="mt-2 text-sm text-white/50 leading-relaxed">
+                    {card.desc}
+                  </p>
+                </motion.div>
+              ))}
             </div>
           </div>
         </div>

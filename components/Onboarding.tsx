@@ -6,7 +6,6 @@ import {
   Brain,
   Users,
   Truck,
-  ArrowRight,
   ChevronRight,
   Award,
 } from "lucide-react";
@@ -32,45 +31,45 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
       title: "Elevating Family Wellness",
       subtitle: "Welcome to DiXon Collective",
       description:
-        "Introduce your family to modern wellness. Browse premium, medical-grade supplements tailored precisely to the nutritional guidelines and metabolic markers that safeguard your family.",
-      icon: <Sparkles className="w-16 h-16 text-secondary" />,
-      colorClass: "bg-secondary-container/20 text-on-secondary-container",
+        "Introduce your family to modern wellness. Browse premium, medical-grade supplements tailored precisely to nutritional and metabolic wellness markers.",
+      icon: <Sparkles className="w-14 h-14 text-emerald-200" />,
+      colorClass: "bg-emerald-500/10 border border-emerald-400/20",
       badgeText: "PREMIUM STANDARD",
     },
     {
       title: "100% Purity Verification",
       subtitle: "Rigorous Safety & Certified Brands",
       description:
-        "Unlike general stores, only pre-screened wellness companies can offer products here. Every booster, powder, and infant nutrient carries a verified DiXon purity and non-toxic badge.",
-      icon: <ShieldCheck className="w-16 h-16 text-primary" />,
-      colorClass: "bg-primary-container/20 text-on-primary-container",
+        "Every supplement passes verified non-toxic screening, ingredient transparency reviews, and advanced quality assurance standards.",
+      icon: <ShieldCheck className="w-14 h-14 text-emerald-200" />,
+      colorClass: "bg-emerald-500/10 border border-emerald-400/20",
       badgeText: "CLINICAL TRANSPARENCY",
     },
     {
       title: "AI-Powered Diagnostics",
       subtitle: "Personalized Intelligent Wellness",
       description:
-        "Gain live diagnostic insights backed by the server-side Gemini model. Receive continuous recommendations, optimal dosage amounts, and clear evaluations that eliminate nutritional gaps.",
-      icon: <Brain className="w-16 h-16 text-secondary" />,
-      colorClass: "bg-secondary-container/25 text-on-secondary-container",
+        "Receive intelligent health insights, dosage recommendations, and personalized nutritional support powered by modern AI systems.",
+      icon: <Brain className="w-14 h-14 text-emerald-200" />,
+      colorClass: "bg-emerald-500/10 border border-emerald-400/20",
       badgeText: "GEMINI 3.5 AI INSIGHT",
     },
     {
       title: "Family Health Management",
       subtitle: "Multi-profile Dynamic Metrics",
       description:
-        "Manage individual schedules, clinical dosages, and health indicators for everyone. Seamless child tracking, wellness profiles, and yes—complete health scans for your faithful pets!",
-      icon: <Users className="w-16 h-16 text-primary" />,
-      colorClass: "bg-primary-container/25 text-on-primary",
+        "Manage children, adults, and pet wellness profiles from one seamless health workspace with advanced tracking tools.",
+      icon: <Users className="w-14 h-14 text-emerald-200" />,
+      colorClass: "bg-emerald-500/10 border border-emerald-400/20",
       badgeText: "FAMILY & PET ECOSYSTEM",
     },
     {
       title: "Predictive Smart Delivery",
       subtitle: "Seamless Concierge Subscriptions",
       description:
-        "Never run out of essential family buffers again. Get active tracking, courier routing, live maps updates, and simple automated monthly restock cycles that support the wellness path.",
-      icon: <Truck className="w-16 h-16 text-secondary" />,
-      colorClass: "bg-secondary-container/20 text-on-secondary-container",
+        "Automated supplement restocking, real-time delivery tracking, and concierge wellness logistics designed for busy families.",
+      icon: <Truck className="w-14 h-14 text-emerald-200" />,
+      colorClass: "bg-emerald-500/10 border border-emerald-400/20",
       badgeText: "CONCIERGE DELIVERY",
     },
   ];
@@ -92,89 +91,155 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
   const step = steps[currentStep];
 
   return (
-    <div className="relative min-h-screen bg-cream flex flex-col justify-between p-6 overflow-hidden md:p-12">
-      {/* Background decorations */}
-      <div className="absolute top-[5%] right-[-15%] w-[450px] h-[450px] rounded-full bg-primary/5 blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[400px] h-[400px] rounded-full bg-secondary/5 blur-[100px] pointer-events-none" />
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-white via-emerald-50/40 to-zinc-50 flex flex-col justify-between px-6 py-8 md:px-10 lg:px-16">
+      {/* Ambient Background */}
 
-      {/* Top Header */}
-      <div className="flex justify-between items-center w-full z-10">
-        <div className="flex items-center gap-2">
-          <Award className="w-5 h-5 text-secondary" />
-          <span className="font-serif text-2xl font-bold tracking-tight text-primary">
-            DiXon
-          </span>
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-[-10%] right-[-10%] w-[36rem] h-[36rem] rounded-full bg-emerald-300/20 blur-[140px]" />
+
+        <div className="absolute bottom-[-15%] left-[-10%] w-[32rem] h-[32rem] rounded-full bg-teal-200/20 blur-[120px]" />
+
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.8),transparent_55%)]" />
+      </div>
+
+      {/* Header */}
+
+      <header className="relative z-10 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-800 shadow-lg flex items-center justify-center">
+            <Award className="w-6 h-6 text-white" />
+          </div>
+
+          <div>
+            <h1 className="font-serif text-3xl font-bold tracking-tight text-zinc-900">
+              DiXon
+            </h1>
+
+            <p className="text-[11px] uppercase tracking-[0.25em] text-zinc-500 font-semibold">
+              Trusted Family Wellness
+            </p>
+          </div>
         </div>
+
         <button
           onClick={onComplete}
-          className="text-sm font-sans tracking-wide text-outline hover:text-primary transition-colors cursor-pointer"
+          className="h-11 px-5 rounded-full border border-zinc-200 bg-white/70 backdrop-blur-xl text-sm font-semibold text-zinc-700 hover:bg-white transition-all"
         >
           Skip
         </button>
-      </div>
+      </header>
 
-      {/* Main Slide Carousel (Animated) */}
-      <div className="flex-1 flex justify-center items-center py-8 z-10">
+      {/* Main Slide */}
+
+      <main className="relative z-10 flex-1 flex items-center justify-center py-12">
         <AnimatePresence mode="wait">
           <motion.div
             key={currentStep}
-            initial={{ opacity: 0, x: 50 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -50 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            className="w-full max-w-lg bg-white/70 backdrop-blur-md p-8 md:p-12 rounded-[24px] border border-white/60 shadow-[0px_10px_40px_rgba(6,27,14,0.03)] flex flex-col items-center text-center"
+            initial={{
+              opacity: 0,
+              y: 30,
+              scale: 0.96,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+            }}
+            exit={{
+              opacity: 0,
+              y: -30,
+              scale: 0.96,
+            }}
+            transition={{
+              duration: 0.45,
+              ease: "easeOut",
+            }}
+            className="relative w-full max-w-2xl overflow-hidden rounded-[2.5rem] border border-white/70 bg-white/80 backdrop-blur-2xl shadow-[0_20px_80px_rgba(0,0,0,0.08)]"
           >
-            {/* Visual Icon Badge */}
-            <motion.div
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              className={`p-6 rounded-[20px] ${step.colorClass} mb-8 flex justify-center items-center shadow-inner`}
-            >
-              {step.icon}
-            </motion.div>
+            {/* Glow */}
 
-            {/* Custom tags/Status badge */}
-            <span className="px-3 py-1 bg-primary/5 text-primary text-[10px] font-mono tracking-widest rounded-full mb-4 uppercase">
-              {step.badgeText}
-            </span>
+            <div className="absolute top-[-30%] right-[-20%] w-[24rem] h-[24rem] rounded-full bg-emerald-200/20 blur-[120px]" />
 
-            {/* Typography */}
-            <h2 className="font-serif text-3xl md:text-4xl text-primary font-bold tracking-tight mb-2">
-              {step.title}
-            </h2>
-            <h4 className="font-sans text-md font-semibold text-secondary mb-4 leading-none">
-              {step.subtitle}
-            </h4>
-            <p className="font-sans text-sm md:text-base text-outline leading-relaxed max-w-sm">
-              {step.description}
-            </p>
+            {/* Content */}
+
+            <div className="relative p-8 md:p-14 text-center">
+              {/* Icon */}
+
+              <motion.div
+                initial={{
+                  scale: 0.8,
+                  opacity: 0,
+                }}
+                animate={{
+                  scale: 1,
+                  opacity: 1,
+                }}
+                transition={{
+                  delay: 0.1,
+                }}
+                className={`w-28 h-28 mx-auto rounded-[2rem] flex items-center justify-center shadow-inner backdrop-blur-xl ${step.colorClass}`}
+              >
+                {step.icon}
+              </motion.div>
+
+              {/* Badge */}
+
+              <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-100">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+
+                <span className="text-[11px] tracking-[0.22em] uppercase font-bold text-emerald-700">
+                  {step.badgeText}
+                </span>
+              </div>
+
+              {/* Typography */}
+
+              <div className="mt-8 space-y-4">
+                <h2 className="font-serif text-4xl md:text-5xl font-bold leading-tight tracking-tight text-zinc-900">
+                  {step.title}
+                </h2>
+
+                <h4 className="text-lg font-semibold text-emerald-700">
+                  {step.subtitle}
+                </h4>
+
+                <p className="max-w-xl mx-auto text-base leading-relaxed text-zinc-600">
+                  {step.description}
+                </p>
+              </div>
+            </div>
           </motion.div>
         </AnimatePresence>
-      </div>
+      </main>
 
-      {/* Footer Navigation Bar */}
-      <div className="w-full max-w-md mx-auto z-10 flex flex-col items-center gap-6 pb-6">
-        {/* Step Indicators */}
-        <div className="flex gap-2">
+      {/* Footer */}
+
+      <footer className="relative z-10 max-w-xl mx-auto w-full flex flex-col items-center gap-8 pb-4">
+        {/* Indicators */}
+
+        <div className="flex items-center gap-3">
           {steps.map((_, index) => (
             <button
               key={index}
               onClick={() => setCurrentStep(index)}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                index === currentStep ? "w-8 bg-primary" : "w-2 bg-primary/25"
+              className={`transition-all duration-300 rounded-full ${
+                index === currentStep
+                  ? "w-12 h-3 bg-emerald-600"
+                  : "w-3 h-3 bg-zinc-300 hover:bg-zinc-400"
               }`}
             />
           ))}
         </div>
 
-        {/* Buttons Controls */}
-        <div className="flex justify-between items-center w-full gap-4">
+        {/* Navigation */}
+
+        <div className="flex items-center justify-between w-full">
           <button
             onClick={handleBack}
-            className={`px-6 py-3 font-sans text-sm font-semibold transition-all ${
+            className={`h-12 px-6 rounded-full text-sm font-semibold transition-all ${
               currentStep === 0
-                ? "text-transparent pointer-events-none"
-                : "text-outline hover:text-primary cursor-pointer"
+                ? "opacity-0 pointer-events-none"
+                : "bg-white border border-zinc-200 text-zinc-700 hover:bg-zinc-50"
             }`}
           >
             Back
@@ -182,13 +247,14 @@ export default function Onboarding({ onComplete }: OnboardingProps) {
 
           <button
             onClick={handleNext}
-            className="flex items-center gap-2 bg-primary text-white px-8 py-3.5 rounded-full font-serif text-md font-bold hover:bg-neutral-800 transition-all shadow-md active:scale-95 cursor-pointer"
+            className="h-14 px-8 rounded-full bg-gradient-to-r from-emerald-700 to-emerald-600 hover:from-emerald-800 hover:to-emerald-700 text-white shadow-xl flex items-center gap-3 font-bold text-base transition-all active:scale-[0.98]"
           >
             {currentStep === steps.length - 1 ? "Enter DiXon" : "Continue"}
-            <ChevronRight className="w-4 h-4" />
+
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
-      </div>
+      </footer>
     </div>
   );
 }

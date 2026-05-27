@@ -11,10 +11,9 @@ import {
   Lock,
   User,
   Activity,
-  HeartPulse,
-  Info,
 } from "lucide-react";
-import { Message, FamilyMember } from "../lib/types";
+
+import { Message } from "../lib/types";
 import { initialFamilyMembers } from "../lib/data";
 import FAQs from "./FAQs";
 
@@ -42,21 +41,23 @@ export default function WellnessAdvisor({
       ],
     },
   ]);
+
   const [inputText, setInputText] = useState("");
   const [loading, setLoading] = useState(false);
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // Trigger from family dashboard
   useEffect(() => {
     if (overridePrompt) {
       setInputText(overridePrompt);
-      if (clearOverride) clearOverride();
+      clearOverride?.();
     }
   }, [overridePrompt, clearOverride]);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const scrollToBottom = () =>
+    messagesEndRef.current?.scrollIntoView({
+      behavior: "smooth",
+    });
 
   useEffect(() => {
     scrollToBottom();
@@ -91,18 +92,12 @@ export default function WellnessAdvisor({
         }),
       });
 
-      if (!response.ok) {
-        throw new Error(
-          `Failed to communicate with medical transparency model. Details: `,
-        );
-      }
-
       const data = await response.json();
 
       const aiMessage: Message = {
         id: "ai-" + Date.now(),
         sender: "ai",
-        text: data.text || "I was unable to structure an advice sheet now.",
+        text: data.text || "Unable to generate advice.",
         timestamp: new Date().toLocaleTimeString([], {
           hour: "2-digit",
           minute: "2-digit",
@@ -111,15 +106,18 @@ export default function WellnessAdvisor({
       };
 
       setMessages((prev) => [...prev, aiMessage]);
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
-      const errorMessage: Message = {
-        id: "ai-err-" + Date.now(),
-        sender: "ai",
-        text: "I experienced high server load while compiling research papers. Please verify your connection or retry in a moment.",
-        timestamp: "Now",
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: "err-" + Date.now(),
+          sender: "ai",
+          text: "I experienced server congestion. Please retry shortly.",
+          timestamp: "Now",
+        },
+      ]);
     } finally {
       setLoading(false);
     }
@@ -137,178 +135,160 @@ export default function WellnessAdvisor({
     "Why sugar-free drops matter?",
   ];
 
-  const clearChat = () => {
+  const clearChat = () =>
     setMessages([
       {
         id: "m-init",
         sender: "ai",
-        text: "Chats cleared. I am ready for your next premium health inquiry.",
+        text: "Chat cleared. Ready for your next health inquiry.",
         timestamp: "Now",
       },
     ]);
-  };
 
   return (
-    <div className="space-y-8 font-sans">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Advisor Meta Side Panel */}
-        <div className="lg:col-span-1 space-y-5">
-          <div className="bg-white rounded-3xl p-5 md:p-6 border border-outline-variant/20 shadow-sm space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-primary-container text-white rounded-2xl">
-                <Brain className="w-5 h-5 text-secondary-container" />
+    <section className="space-y-8">
+      <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+        {/* LEFT PANEL */}
+
+        <aside className="space-y-6">
+          <div className="rounded-3xl border border-emerald-100 bg-gradient-to-br from-white to-emerald-50/70 shadow-lg p-6 backdrop-blur-xl">
+            <div className="flex items-center gap-4 mb-5">
+              <div className="rounded-2xl bg-emerald-600 p-4 shadow-lg">
+                <Brain className="w-5 h-5 text-white" />
               </div>
+
               <div>
-                <h4 className="font-serif text-md font-bold text-primary leading-none">
-                  Intelligence Engine
-                </h4>
-                <p className="text-[10px] font-mono tracking-wider text-[#737973] uppercase mt-1">
-                  Gemini 3.5 AI
+                <h3 className="font-serif text-lg font-bold text-emerald-950">
+                  DiXon AI Engine
+                </h3>
+
+                <p className="text-[11px] uppercase tracking-[0.2em] text-emerald-500 font-medium">
+                  Gemini Intelligence
                 </p>
               </div>
             </div>
-            <p className="text-xs text-outline leading-relaxed">
-              All consultations are securely processed on our protected server.
-              Gemini scans open-web biomedical directories, combining medical
-              transparency benchmarks with your family diagnostic reports.
+
+            <p className="text-sm text-emerald-800 leading-relaxed">
+              Premium biomedical intelligence for personalized family wellness.
             </p>
-            <div className="pt-2 flex items-center gap-2 text-[10px] font-mono tracking-widest text-[#336d72] bg-secondary-container/10 px-3 py-1.5 rounded-xl border border-[#b2edf2]/20">
-              <Lock className="w-3 h-3 text-[#336d72]" />
-              AES-256 PIPEDA SECURE
+
+            <div className="mt-5 inline-flex items-center gap-2 rounded-2xl border border-emerald-200 bg-white px-4 py-2 text-xs font-semibold text-emerald-700">
+              <Lock className="w-4 h-4" />
+              AES-256 Protected
             </div>
           </div>
 
-          {/* Quick Prompts Bento Selection */}
-          <div className="bg-white rounded-3xl p-5 md:p-6 border border-outline-variant/20 shadow-sm">
-            <span className="text-[10px] font-mono tracking-widest uppercase text-outline block mb-3">
-              Suggested Inquiries
-            </span>
-            <div className="flex flex-col gap-2">
+          <div className="rounded-3xl bg-white border border-zinc-100 shadow-lg p-6">
+            <p className="text-xs uppercase tracking-[0.18em] text-zinc-500 mb-4">
+              Suggested Questions
+            </p>
+
+            <div className="space-y-3">
               {quickPrompts.map((p, idx) => (
                 <button
                   key={idx}
                   onClick={() => setInputText(p)}
-                  className="w-full text-left p-3 bg-cream/50 text-xs font-semibold text-primary hover:bg-cream rounded-xl border border-outline-variant/10 transition-colors flex items-center justify-between cursor-pointer"
+                  className="group w-full rounded-2xl border border-zinc-100 bg-zinc-50 hover:bg-emerald-50 px-4 py-4 text-left transition-all"
                 >
-                  <span>{p}</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-secondary shrink-0" />
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-zinc-800">
+                      {p}
+                    </span>
+
+                    <ArrowRight className="w-4 h-4 text-emerald-500 group-hover:translate-x-1 transition-transform" />
+                  </div>
                 </button>
               ))}
             </div>
           </div>
-        </div>
+        </aside>
 
-        {/* Main Chat Panel */}
-        <div className="lg:col-span-3 bg-white rounded-3xl overflow-hidden border border-outline-variant/20 shadow-sm flex flex-col h-[600px] justify-between">
-          {/* Header bar */}
-          <div className="px-6 py-4 border-b border-light-outline/10 bg-cream/30 flex justify-between items-center shrink-0">
-            <div className="flex items-center gap-2.5">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-primary-container text-white flex items-center justify-center font-bold">
-                  <Sparkles className="w-5 h-5 text-secondary-container animate-pulse" />
-                </div>
-                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white" />
+        {/* CHAT */}
+
+        <main className="xl:col-span-3 rounded-[2rem] overflow-hidden border border-zinc-100 bg-white shadow-2xl">
+          {/* HEADER */}
+
+          <header className="border-b bg-gradient-to-r from-emerald-50 to-white px-7 py-5 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="relative rounded-2xl bg-emerald-600 p-3 shadow-md">
+                <Sparkles className="w-5 h-5 text-white animate-pulse" />
               </div>
+
               <div>
-                <h4 className="font-serif text-md font-bold text-primary flex items-center gap-1.5">
-                  Intelligent Advisor
-                  <ShieldCheck className="w-4 h-4 text-secondary" />
-                </h4>
-                <p className="text-[10px] font-mono text-[#737973] uppercase tracking-wider leading-none">
-                  Continuous Science Verification
+                <h3 className="font-serif text-lg font-bold text-zinc-900 flex gap-2 items-center">
+                  Wellness Advisor
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                </h3>
+
+                <p className="text-xs tracking-[0.15em] uppercase text-zinc-500">
+                  Real-time scientific validation
                 </p>
               </div>
             </div>
 
             <button
               onClick={clearChat}
-              className="p-2 text-outline hover:text-red-600 rounded-full hover:bg-red-50 hover:border-red-100 border border-transparent transition-all cursor-pointer"
-              title="Clear Consultation Details"
+              className="rounded-xl p-3 hover:bg-red-50 text-zinc-500 hover:text-red-600 transition"
             >
               <Trash2 className="w-4 h-4" />
             </button>
-          </div>
+          </header>
 
-          {/* Message Stream */}
-          <div className="flex-1 p-6 overflow-y-auto space-y-6 scrollbar-none">
+          {/* MESSAGES */}
+
+          <div className="h-[640px] overflow-y-auto p-8 space-y-7 bg-gradient-to-b from-white to-zinc-50/60">
             {messages.map((m) => (
-              <div
+              <motion.div
                 key={m.id}
-                className={`flex gap-3.5 max-w-[85%] ${
-                  m.sender === "user" ? "ml-auto flex-row-reverse" : "mr-auto"
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`flex gap-4 ${
+                  m.sender === "user" ? "justify-end" : "justify-start"
                 }`}
               >
-                {/* Profile Bubble Avatar */}
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 font-bold text-xs uppercase shadow-inner ${
+                  className={`max-w-[78%] rounded-3xl px-6 py-5 shadow-sm ${
                     m.sender === "user"
-                      ? "bg-secondary text-white"
-                      : "bg-primary-container text-[#fbf9f4]"
+                      ? "bg-emerald-600 text-white"
+                      : "bg-white border border-zinc-100"
                   }`}
                 >
-                  {m.sender === "user" ? (
-                    <User className="w-4 h-4" />
-                  ) : (
-                    <Brain className="w-4 h-4 text-secondary-container" />
+                  <p className="text-[15px] leading-relaxed">{m.text}</p>
+
+                  {m.groundingSources && m.groundingSources.length > 0 && (
+                    <div className="mt-5 pt-4 border-t border-zinc-100 flex flex-wrap gap-2">
+                      {m.groundingSources.map((source, i) => (
+                        <a
+                          key={i}
+                          href={source.uri}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-4 py-2 text-xs font-semibold text-emerald-700 hover:bg-emerald-100"
+                        >
+                          {source.title}
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      ))}
+                    </div>
                   )}
-                </div>
 
-                <div className="space-y-1.5">
-                  {/* Text Bubble */}
-                  <div
-                    className={`p-4 rounded-2xl text-[13px] md:text-sm leading-relaxed whitespace-pre-wrap ${
-                      m.sender === "user"
-                        ? "bg-secondary text-white rounded-tr-none"
-                        : "bg-cream/70 text-primary rounded-tl-none border border-outline-variant/15"
-                    }`}
-                  >
-                    {m.text}
-
-                    {/* Sources Grounding links if any */}
-                    {m.groundingSources && m.groundingSources.length > 0 && (
-                      <div className="mt-4 pt-3.5 border-t border-outline-variant/10 space-y-2">
-                        <span className="text-[9px] font-mono tracking-widest text-outline uppercase block">
-                          Science Citations:
-                        </span>
-                        <div className="flex flex-wrap gap-2">
-                          {m.groundingSources.map((source, sIdx) => (
-                            <a
-                              key={sIdx}
-                              href={source.uri}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 bg-white text-secondary text-[10px] font-bold px-2.5 py-1 rounded-full border border-secondary/20 hover:border-secondary hover:text-primary transition-all transition-colors"
-                            >
-                              <span>{source.title}</span>
-                              <ExternalLink className="w-2.5 h-2.5 shrink-0" />
-                            </a>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div
-                    className={`text-[9px] font-mono tracking-wider uppercase text-outline px-1 ${
-                      m.sender === "user" ? "text-right" : "text-left"
-                    }`}
-                  >
+                  <p className="mt-3 text-[10px] uppercase tracking-[0.18em] opacity-70">
                     {m.timestamp}
-                  </div>
+                  </p>
                 </div>
-              </div>
+              </motion.div>
             ))}
 
-            {/* Shimmering AI Loader */}
             {loading && (
-              <div className="flex gap-3.5 mr-auto max-w-[85%]">
-                <div className="w-8 h-8 rounded-full bg-primary-container text-white flex items-center justify-center animate-spin">
-                  <Activity className="w-4 h-4 text-secondary-container" />
+              <div className="flex gap-4">
+                <div className="rounded-full bg-emerald-600 p-3 animate-spin">
+                  <Activity className="w-4 h-4 text-white" />
                 </div>
-                <div className="bg-cream/40 p-4 rounded-2xl rounded-tl-none border border-outline-variant/15 space-y-2 w-72">
-                  <div className="h-4 bg-primary/10 rounded animate-pulse w-full" />
-                  <div className="h-4 bg-primary/10 rounded animate-pulse w-5/6" />
-                  <div className="h-4 bg-primary/10 rounded animate-pulse w-4/6" />
+
+                <div className="rounded-3xl border bg-white p-5 w-72 space-y-3">
+                  <div className="h-4 rounded bg-zinc-100 animate-pulse" />
+                  <div className="h-4 rounded bg-zinc-100 animate-pulse w-4/5" />
+                  <div className="h-4 rounded bg-zinc-100 animate-pulse w-2/3" />
                 </div>
               </div>
             )}
@@ -316,31 +296,31 @@ export default function WellnessAdvisor({
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Input Bar Form */}
-          <div className="p-4 border-t border-outline-variant/15 bg-cream/15 shrink-0">
-            <form className="flex gap-2" onSubmit={handleFormSubmit}>
+          {/* INPUT */}
+
+          <footer className="border-t bg-white p-5">
+            <form onSubmit={handleFormSubmit} className="flex gap-3">
               <input
-                type="text"
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
-                placeholder="Ask Advisor about omega levels, child safety drops, magnesium etc..."
+                placeholder="Ask about vitamins, minerals, wellness..."
                 disabled={loading}
-                className="flex-1 h-12 px-4 text-sm bg-white border border-outline-variant/20 rounded-xl focus:border-secondary focus:ring-1 focus:ring-secondary/50 outline-none transition-all placeholder-outline-variant/50"
+                className="flex-1 rounded-2xl border border-zinc-200 px-5 h-14 text-sm outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-100"
               />
+
               <button
                 type="submit"
-                disabled={!inputText.trim() || loading}
-                className="w-12 h-12 bg-primary hover:bg-neutral-800 disabled:bg-primary/40 disabled:cursor-not-allowed text-white rounded-xl flex items-center justify-center transition-all cursor-pointer active:scale-95 shrink-0"
+                disabled={!inputText.trim()}
+                className="h-14 w-14 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center shadow-lg transition"
               >
-                <Send className="w-4 h-4 text-white" />
+                <Send className="w-5 h-5" />
               </button>
             </form>
-          </div>
-        </div>
+          </footer>
+        </main>
       </div>
 
-      {/* Interactive FAQs component */}
-      <FAQs onAskQuestion={(qText) => handleSend(qText)} />
-    </div>
+      <FAQs onAskQuestion={(q) => handleSend(q)} />
+    </section>
   );
 }
